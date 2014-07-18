@@ -3,6 +3,7 @@
 require 'java'
 
 java_import 'com.espertech.esper.client.Configuration'
+java_import 'com.espertech.esper.client.ConfigurationVariantStream'
 java_import 'com.espertech.esper.client.EPServiceProvider'
 java_import 'com.espertech.esper.client.EPServiceProviderManager'
 java_import 'com.espertech.esper.client.EPStatement'
@@ -26,14 +27,13 @@ class TestListener
 end
 
 config = com.espertech.esper.client.Configuration.new
-
 map = java.util.HashMap.new
 map.put("key", java.lang.String.java_class)
 map.put("val", java.lang.Long.java_class)
 config.addEventType("SampleEvent", map)
 
 serv = EPServiceProviderManager.getDefaultProvider(config)
-st = serv.getEPAdministrator().createEPL("select key,val from SampleEvent where val >= 50");
+st = serv.getEPAdministrator().createEPL("select count(*) from SampleEvent.win:time( 5 sec ) output last every 1 seconds")
 
 listener = TestListener.new
 st.addListener(listener)
@@ -41,8 +41,10 @@ st.addListener(listener)
 
 event = java.util.HashMap.new
 event.put("key", "test1")
-event.put("val", 100)
-serv.getEPRuntime.sendEvent(event, "SampleEvent")
 
-event.put("val", 10)
-serv.getEPRuntime.sendEvent(event, "SampleEvent")
+100.times.each do | n |
+event.put("val", rand(100))
+  serv.getEPRuntime.sendEvent(event, "SampleEvent")
+  sleep 1
+end
+
