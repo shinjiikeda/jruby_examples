@@ -10,9 +10,8 @@ java_import 'com.espertech.esper.client.UpdateListener'
 java_import 'com.espertech.esper.client.EventBean'
 java_import 'java.util.HashMap'
 
-
-class TestListener
-  include UpdateListener
+class TestListener 
+  #include UpdateListener
 
   def initialize()
     puts "Initialized EsperListener"
@@ -34,7 +33,7 @@ map.put("val", java.lang.Long.java_class)
 config.addEventType("SampleEvent", map)
 
 serv = EPServiceProviderManager.getDefaultProvider(config)
-st = serv.getEPAdministrator().createEPL("select * from SampleEvent(val >= 5)");
+st = serv.getEPAdministrator().createEPL("select key,val from SampleEvent where val >= 50");
 
 listener = TestListener.new
 st.addListener(listener)
