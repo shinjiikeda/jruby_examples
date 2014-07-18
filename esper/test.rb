@@ -21,7 +21,8 @@ class TestListener
   java_signature 'void update(EventBean[], EventBean[])'
   def update(newEvents, oldEvents)
     newEvents.each do |event|
-      puts "New event: #{event.getUnderlying.toString}"
+      puts "New event: #{event.get("c")}"
+      #puts "New event: #{event.getUnderlying.toString}"
     end
   end
 end
@@ -33,7 +34,9 @@ map.put("val", java.lang.Long.java_class)
 config.addEventType("SampleEvent", map)
 
 serv = EPServiceProviderManager.getDefaultProvider(config)
-st = serv.getEPAdministrator().createEPL("select count(*) from SampleEvent.win:time( 5 sec ) output last every 1 seconds")
+
+st = serv.getEPAdministrator().createEPL("select count(*) c from SampleEvent.win:time( 10 sec ) output first every 10 sec ")
+#st = serv.getEPAdministrator().createEPL("select count(*) c from SampleEvent.win:time( 5 sec ) output after 5 sec ")
 
 listener = TestListener.new
 st.addListener(listener)
